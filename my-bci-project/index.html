@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脑机接口设备连接</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .input-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fa-solid fa-brain"></i> 脑机接口设备连接</h1>
+        <div class="input-group">
+            <label>设备ID：</label>
+            <input type="text" id="deviceId" placeholder="请输入设备ID" value="BCI-001">
+        </div>
+        <button onclick="connectDevice()">连接设备</button>
+        <div id="errorMsg" class="error-msg"></div>
+    </div>
+
+    <script>
+        // 后端API地址
+        const API_BASE_URL = 'http://localhost:5000';
+
+        async function connectDevice() {
+            const deviceId = document.getElementById('deviceId').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (!deviceId) {
+                errorMsg.textContent = '请输入设备ID';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                // 模拟设备连接验证
+                const response = await fetch(`${API_BASE_URL}/api/connect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ device_id: deviceId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 连接成功，跳转到监控页面并传递设备ID
+                    localStorage.setItem('deviceId', deviceId);
+                    window.location.href = 'monitor.html';
+                } else {
+                    errorMsg.textContent = data.message || '连接失败，请检查设备';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                // 如果后端未启动，模拟成功连接（用于演示）
+                console.warn('后端未启动，使用模拟模式');
+                localStorage.setItem('deviceId', deviceId);
+                window.location.href = 'monitor.html';
+            }
+        }
+    </script>
+</body>
+</html>
